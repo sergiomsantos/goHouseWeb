@@ -11,8 +11,8 @@ __version__ = "0.1"
 from flask import render_template
 from webapp import app
 
-#------------------------------------------------------------------------------
 
+#------------------------------------------------
 @app.route('/')
 def index():
     '''
@@ -21,36 +21,46 @@ def index():
     return render_template('index.html')
 
 
+#------------------------------------------------
 @app.route('/login')
 def login():
     '''
-    Main entry point to the application
+    Login webpage
     '''
     return render_template('login.html')
 
 
+#------------------------------------------------
 @app.route('/register')
 def register():
     '''
-    Main entry point to the application
+    Registration webpage
     '''
     return render_template('register.html')
 
+
+#------------------------------------------------
 @app.route('/market')
 def market():
     '''
-    Main entry point to the application
+    Main market webpage
     '''
     return render_template('market.html')
 
+
+#------------------------------------------------
 @app.route('/rentals')
 def rentals():
     '''
-    Main entry point to the application
+    User's rentals webpage
     '''
     return render_template('rentals.html')
 
 
+#------------------------------------------------
 @app.route('/houses')
 def houses():
+    '''
+    User's houses webpage
+    '''
     return render_template('houses.html')
