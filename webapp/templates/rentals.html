@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}goHouse - my rentals{% endblock %}
+
+{% block content %}
+<h2 class="text-info my-4">My Rentals</h2>
+<p>You can rent houses in the <a href="{{ url_for('market') }}">market</a>.</p>
+<div id="house-card-container" class="row">
+</div>
+
+{% endblock %}
+
+{% block finalscripts %}
+{{ super() }}
+<script>
+
+/* ----------------------------------------------------
+    redirect if no token is available
+---------------------------------------------------- */    
+if (getCookie('token') == null) {
+    window.location.href = "{{ url_for('index') }}";
+}
+
+$(document).ready(function() {
+
+    const TOKEN = getCookie('token'),
+          USERID = getCookie('email'),
+          USERNAME = getCookie('username');
+
+    $("#username-header").text('Welcome ' + USERNAME);
+    
+    /* ----------------------------------------------------
+     set authorization header
+    ---------------------------------------------------- */
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + TOKEN);
+        }
+    });
+
+    /* ----------------------------------------------------
+     build a HTML house card
+    ---------------------------------------------------- */
+    function getHouseCard(house) {
+        return `<div class="col-sm-6 mb-3">
+            <div class="card">
+                <span class="house-bg"><i class="fa fa-home" aria-hidden="true"></i></span>
+                <div class="card-body">
+                    <h5 class="card-title mb-0">${house.name}</h5>
+                    <p class="card-text">
+                        <small class="card-text text-muted">ID ${house.id}</small>
+                    </p>
+                    <p class="card-text">owner ID: ${house.owner.email}</p>
+                    <button data-target="${house.id}" class="btn btn-sm btn-outline-info cease-btn">cease</button>
+                </div>
+            </div>
+        </div>`;
+    };
+
+    /* ----------------------------------------------------
+     Load all rented houses
+    ---------------------------------------------------- */
+    $.get(`http://192.168.160.233:8080/goHouse/api/users/${USERID}/rentals`,
+        function(houses) {
+            // load each rented house into the container
+            houses.forEach(house => {
+                $("#house-card-container").append(getHouseCard(house));
+            });
+            
+            // bind rent clicks
+            $('.cease-btn').click(function() {
+                var houseID = $(this).data('target');
+                if (confirm(`Are you sure you want to cease renting of house ${houseID}?`)) {
+                    ceaseRental(houseID);
+                }
+            });
+        }
+    );
+
+    /* ----------------------------------------------------
+     Cease a renting contract
+    ---------------------------------------------------- */
+    function ceaseRental(houseID) {
+        $.ajax({
+            type: "DELETE",
+            url: `http://192.168.160.233:8080/goHouse/api/users/${USERID}/rentals/${houseID}`,
+            success: function(data) {
+                window.location.reload();
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}goHouse{% endblock %}
+{% block navbar %}{% endblock %}
+{% block content %}
+<div class="col-md-4 offset-md-4 my-4">
+    <h1 class="mx-2 text-primary my-4 text-center">goHouse</h1>
+    <p class="text-center text-primary" style="font-size: 1000%;">
+        <i class="fa fa-home" aria-hidden="true"></i>
+    </p>
+    <p class="text-center text-primary">
+        <a href="{{ url_for('login') }}">sign in</a>
+    </p>
+    <p class="text-center text-primary">
+        <a href="{{ url_for('register') }}">register</a>
+    </p>
+    <br>
+    <p class="text-center text-primary">
+    <small>
+        <i class="fa fa-copyright" aria-hidden="true"></i> Sérgio M. Santos, 2018
+    </small>
+    </p>
+</div>
+{% endblock %}

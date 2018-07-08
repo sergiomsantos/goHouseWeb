@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link  href="{{ url_for('static', filename='lib/css/bootstrap.min.css')}}" rel="stylesheet">
+    <link  href="{{ url_for('static', filename='lib/css/font-awesome.min.css')}}" rel="stylesheet">
+    <style>
+        .card:hover {
+            box-shadow: 0px 0px 5px gray;
+            transform: translateY(-1px);
+        }
+        .card-body {
+            z-index: 1;
+        }
+        .house-bg {
+            z-index: 0;
+            position: absolute;
+            color: lightblue;
+            opacity: 0.5;
+            font-size: 200px;
+            top: -50px;
+            right: -30px;
+        }
+        .card {
+            overflow: hidden;
+            border-color: lightblue;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <!-- ==================== NAVBAR ==================== -->
+    {% block navbar %}
+    <nav id="navbar-example2" class="navbar navbar-light bg-light">
+        <a id="username-header" class="navbar-brand text-info" href="{{ url_for('index') }}"></a>
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link text-info" href="{{url_for('market')}}">market</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-info" href="{{url_for('houses')}}">my houses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-info" href="{{url_for('rentals')}}">my rentals</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-info" id="logout" href="javascript:void(0)">logout <i class="fa fa-sign-out"></i></a>
+            </li>
+            
+        </ul>
+    </nav>
+    {% endblock %}
+    <!-- ==================== BODY ==================== -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <!-- ==================== FINALSCRIPTS ==================== -->
+    {% block finalscripts %}
+    <script src="{{ url_for('static', filename='lib/js/jquery.js')}}"></script>
+    <script src="{{ url_for('static', filename='lib/js/cookies.js')}}"></script>
+    <script>
+        function logout() {
+            setCookie('token', "", -1);
+            setCookie('email', "", -1);
+            setCookie('username', "", -1);
+            setTimeout(function() {
+                window.location.href = "{{ url_for('index') }}";
+            }, 500);
+        };
+        $('#logout').click(function(e) {
+            if(confirm('Are you sure you want to log out?')) {
+                $.ajax({
+                    type: 'GET',
+                    error: logout,
+                    success: logout,
+                    url: 'http://192.168.160.233:8080/goHouse/api/auth/logout',
+                });
+            }
+            return false;
+        });
+    </script>
+    {% endblock %}
+    
+</body>
+</html>

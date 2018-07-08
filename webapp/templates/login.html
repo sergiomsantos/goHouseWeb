@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block navbar %}{% endblock %}
+{% block content %}
+<div class="col-md-4 offset-md-4 my-4">
+    <h1 class="mx-2 text-primary mt-4 mb-0">
+        <a href="{{ url_for('index') }}">
+            <i class="fa fa-home" aria-hidden="true"></i> goHouse
+        </a>
+    </h1>
+    <h5 class="mx-2 text-primary">sign in</h5>
+    <br>
+    
+    <form id="login_form" class="form" action="login" method="POST">
+        
+        <!-- ============ EMAIL ============ -->
+        <div class="form-group">
+            <small class="col control-label">
+                Email
+            </small>
+            <div class="col">
+                <input class="form-control form-control-sm " id="email" name="email" placeholder="ex. johndoe@mail.com" required="" type="email"/>
+                <small class="form-text text-muted">
+                    required
+                </small>
+    
+            </div>
+        </div>
+            
+        <!-- ============ PASSWORD ============ -->
+        <div class="form-group">
+            <small class="col control-label">
+                Password
+            </small>
+            <div class="col">
+                <input class="form-control form-control-sm " id="password" name="password" required="" type="password"/>
+                <small class="form-text text-muted">
+                    required
+                </small>
+                
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="col">
+                <button class="btn btn-sm btn-primary float-right" type="submit">sign in</button>
+            </div>
+        </div>
+    </form>
+    <br>
+    <p class="text-center text-primary">
+    <small>
+        <i class="fa fa-copyright" aria-hidden="true"></i> S.M. Santos, 2018 | UA
+    </small>
+    </p>
+</div>
+{% endblock %}
+{% block finalscripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+    $("#login_form").submit(function(event) {
+        event.preventDefault();
+        
+        var data = {
+            email : $('#email').val(),
+            password : $('#password').val(),
+        };
+        
+        $.ajax({
+            type: "POST",
+            data: data,
+            datatype: "json",
+            url: "http://192.168.160.233:8080/goHouse/api/auth/login",
+            success: function(result) {
+                setCookie('token', result.token, 1);
+                setCookie('email', result.ownerId, 1);
+                setCookie('username', result.ownerName, 1);
+                window.location = "{{ url_for('market') }}";
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+        return false;
+    });
+
+});
+</script>
+{% endblock %}

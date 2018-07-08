@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}goHouse - market{% endblock %}
+
+{% block content %}
+<h2 class="text-info my-4">Market</h2>
+<p>Houses available for renting</p>
+<!-- <p id="token-header"></p> -->
+<div id="house-card-container" class="row"></div>
+{% endblock %}
+
+{% block finalscripts %}
+{{ super() }}
+<script>
+
+/* ----------------------------------------------------
+ redirect if no token is available
+---------------------------------------------------- */    
+if (getCookie('token') == null) {
+    window.location.href = "{{ url_for('index') }}";
+}
+
+$(document).ready(function() {
+
+    const TOKEN = getCookie('token'),
+          USERID = getCookie('email'),
+          USERNAME = getCookie('username');
+    
+    $("#username-header").text('Welcome ' + USERNAME);
+    // $("#token-header").text(TOKEN);
+
+    /* ----------------------------------------------------
+     set authorization header
+    ---------------------------------------------------- */
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + TOKEN);
+        }
+    });
+    
+    /* ----------------------------------------------------
+     build a HTML house card
+    ---------------------------------------------------- */
+    function getHouseCard(house) {
+        var badge = '';
+        if (house.owner.email===USERID) {
+            badge = ` <span class="badge badge-info">my house</span>`
+        }
+        return `<div class="col-sm-6 mb-3">
+            <div class="card">
+                <span class="house-bg"><i class="fa fa-home" aria-hidden="true"></i></span>
+                <div class="card-body">
+                    <h5 class="card-title mb-0">${house.name}</h5>
+                    <p class="card-text">
+                        <small class="card-text text-muted">ID ${house.id}${badge}</small>
+                    </p>
+                    <p class="card-text">owner ID: ${house.owner.email}</p>
+                    <button data-target="${house.id}" class="btn btn-sm btn-outline-info rent-btn">rent</button>
+                </div>
+            </div>
+        </div>`;
+    };
+
+    /* ----------------------------------------------------
+     Load all houses in the market
+    ---------------------------------------------------- */
+    $.get("http://192.168.160.233:8080/goHouse/api/houses",
+        function(houses) {
+            houses.forEach(house => {
+                $("#house-card-container").append(getHouseCard(house));
+            });
+            
+            $('.rent-btn').click(function() {
+                var houseID = $(this).data('target');
+                if (confirm(`Are you sure you want to rent house ${houseID}?`)) {
+                    rentHouse(houseID);
+                }
+            });
+        }
+    );
+
+
+    /* ----------------------------------------------------
+     rent a single house
+    ---------------------------------------------------- */
+    function rentHouse(houseID) {
+        $.ajax({
+            type: "POST",
+            datatype: "json",
+            url: `http://192.168.160.233:8080/goHouse/api/users/${USERID}/rentals/${houseID}`,
+            success: function() {
+                window.location.reload();
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

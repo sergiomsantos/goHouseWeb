@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}goHouse - my houses{% endblock %}
+
+{% block content %}
+<h2 class="text-info my-4">My Houses</h2>
+<div id="house-card-container" class="row"></div>
+<h3 class="text-info mt-4">Add house</h3>
+<div class="row">
+    <form id="add-house-form" class="form col px-0">  
+        <!-- ============ EMAIL ============ -->
+        <div class="form-group">
+            <small class="col control-label">House Name</small>
+            <div class="col">
+                <input class="form-control form-control-sm " id="name" name="name" placeholder="ex. John Doe's house" required="" type="text"/>
+                <small class="form-text text-muted">
+                    required
+                </small>
+    
+            </div>
+        </div>
+        <!-- ============ PASSWORD ============ -->
+        <div class="form-group">
+            <div class="col">
+                <button class="btn btn-sm btn-info float-right" type="submit">add house</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+
+{% block finalscripts %}
+{{ super() }}
+
+<script>
+
+/* ----------------------------------------------------
+    redirect if no token is available
+---------------------------------------------------- */    
+if (getCookie('token') == null) {
+    window.location.href = "{{ url_for('index') }}";
+}
+
+$(document).ready(function() {
+    
+    const TOKEN = getCookie('token'),
+          USERID = getCookie('email'),
+          USERNAME = getCookie('username');
+    
+    $("#username-header").text('Welcome ' + USERNAME);
+
+    /* ----------------------------------------------------
+     set authorization header
+    ---------------------------------------------------- */
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + TOKEN);
+        }
+    });
+    
+    /* ----------------------------------------------------
+     build a HTML house card
+    ---------------------------------------------------- */
+    function addHouseCard(house) {
+        var color,tenant;
+        if (house.status==='AVAILABLE') {
+            color = 'success';
+            tenant = `<p class="card-text" style="visibility: hidden;">tenant ID</p>`
+        } else {
+            color = 'danger';
+            tenant = `<p class="card-text">tenant ID: ${house.tenant.email}</p>`
+        }
+        return `<div class="col-sm-6 mb-3">
+            <div class="card">
+                <span class="house-bg"><i class="fa fa-home" aria-hidden="true"></i></span>
+                <div class="card-body">
+                    <h5 class="card-title mb-0 text-info">${house.name}</h5>
+                    <p class="card-text">
+                        <small class="card-text text-muted">ID ${house.id} <span class="badge badge-${color}">${house.status}</span></small>
+                    </p>
+                    ${tenant}
+                    <button data-target="${house.id}" class="btn btn-sm btn-outline-info remove-btn">remove from market</button>
+                </div>
+            </div>
+        </div>`;
+    };
+
+    /* ----------------------------------------------------
+     Load owned houses
+    ---------------------------------------------------- */
+    $.get(`http://192.168.160.233:8080/goHouse/api/users/${USERID}/houses`,
+        function(houses) {
+            // load each rented house into the container
+            houses.forEach(house => {
+                $("#house-card-container").append(addHouseCard(house));
+            });
+            
+            // bind rent clicks
+            $('.remove-btn').click(function() {
+                var houseID = $(this).data('target');
+                if (confirm(`Are you sure you want to house ${houseID} from the market?`)) {
+                    removeHouse(houseID);
+                }
+            });
+        }
+    );
+
+    /* ----------------------------------------------------
+     remove house from the market
+    ---------------------------------------------------- */
+    function removeHouse(houseID) {
+        $.ajax({
+            type: "DELETE",
+            url: `http://192.168.160.233:8080/goHouse/api/users/${USERID}/houses/${houseID}`,
+            success: function(data) {
+                window.location.reload();
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    }
+
+    /* ----------------------------------------------------
+     add new house submission form
+    ---------------------------------------------------- */
+    $("#add-house-form").submit(function(event) {
+        event.preventDefault();
+        
+        $.ajax({
+            type: "POST",
+            datatype: "json",
+            data: {name: $('#name').val()},
+            url: `http://192.168.160.233:8080/goHouse/api/users/${USERID}/houses`,
+            success: function(data) {
+                window.location.reload();
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+        return false;
+    });
+
+});
+</script>
+{% endblock %}
