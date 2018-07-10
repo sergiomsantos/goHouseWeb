@@ -8,10 +8,6 @@ from flask import url_for
 
 from webapp import app
 
-# Flask-Testing==0.7.1
-# selenium==3.13.0
-# nose2==0.7.4
-
 RAND_EMAIL = 'rdnaodhkw82878e@mail.com'
 RAND_PASSWORD = 'rdnaodhkw82878e'
 
@@ -25,7 +21,7 @@ class TestBase(LiveServerTestCase):
     
     def setUp(self):
         '''Setup the test driver and create test users'''
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Chrome()
         self.driver.get(self.get_server_url())
 
     def tearDown(self):
