@@ -4,7 +4,7 @@
 {% block content %}
 <div class="col-md-4 offset-md-4 my-4">
     <h1 class="mx-2 text-primary mt-4 mb-0">
-        <a href="{{ url_for('index') }}">
+        <a id="index-link" href="{{ url_for('index') }}">
             <i class="fa fa-home" aria-hidden="true"></i> goHouse
         </a>
     </h1>
@@ -43,7 +43,7 @@
         
         <div class="form-group">
             <div class="col">
-                <button class="btn btn-sm btn-primary float-right" type="submit">sign in</button>
+                <button id="submit" class="btn btn-sm btn-primary float-right" type="submit">sign in</button>
             </div>
         </div>
     </form>
