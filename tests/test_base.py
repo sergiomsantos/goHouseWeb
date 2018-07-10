@@ -24,6 +24,7 @@ HEADLESS = True
 class TestBase(LiveServerTestCase):
     
     def create_app(self):
+        app.config['LIVESERVER_PORT'] = 8943
         return app
     
     def setUp(self):
