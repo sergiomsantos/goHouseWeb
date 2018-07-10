@@ -1,5 +1,7 @@
 # INSTALL
 
+[![Build Status](https://travis-ci.org/sergiomsantos/goHouseWeb.svg?branch=master)](https://travis-ci.org/sergiomsantos/goHouseWeb)
+
 ## 1. SYSTEMD
 
 ```bash
